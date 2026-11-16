@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { AnomalyDetectorTable, hitKey } from '@/components/AnomalyDetectorTable';
+import { AnomalyStaleWarning } from '@/components/AnomalyStaleWarning';
 import { CnesBreakdown } from '@/components/CnesBreakdown';
 import { PeriodFilter } from '@/components/PeriodFilter';
 import type { ComboboxItem } from '@/components/ui/combobox';
@@ -351,6 +352,10 @@ export default function Explore() {
           </div>
 
           <section className="col-span-full mt-2">
+            {!loading && payload ? (
+              <AnomalyStaleWarning generatedAt={payload.generatedAt} geradoEm={manifest.geradoEm} />
+            ) : null}
+
             {loading ? (
               <div className="text-muted-foreground flex h-[360px] items-center justify-center gap-3 font-sans text-sm">
                 <div className="border-muted-foreground/30 border-t-primary size-5 animate-spin rounded-full border-2" />

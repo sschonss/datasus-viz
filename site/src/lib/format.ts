@@ -39,3 +39,17 @@ export function formatGeradoEm(iso: string): string {
   const d = new Date(iso);
   return Number.isNaN(d.getTime()) ? '—' : GERADO_EM_FMT.format(d);
 }
+
+const GERADO_EM_DT_FMT = new Intl.DateTimeFormat('pt-BR', {
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+});
+
+/** Data e hora de geração (ISO) como `dd/mm/aaaa, hh:mm`; `—` se inválida. */
+export function formatGeradoEmDateTime(iso: string): string {
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? '—' : GERADO_EM_DT_FMT.format(d);
+}

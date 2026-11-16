@@ -6,10 +6,6 @@ export interface AnomalyStaleWarningProps {
   geradoEm: string | undefined;
 }
 
-/**
- * Aviso em `/explore` quando o JSON de atipicidades é anterior ao
- * manifest dos agregados (artefato committed no Pages, parquet no CDN).
- */
 export function AnomalyStaleWarning({ generatedAt, geradoEm }: AnomalyStaleWarningProps) {
   if (!isAnomalyArtifactStale(generatedAt, geradoEm)) return null;
   return (

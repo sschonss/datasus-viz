@@ -48,7 +48,6 @@ const GERADO_EM_DT_FMT = new Intl.DateTimeFormat('pt-BR', {
   year: 'numeric',
 });
 
-/** Data e hora de geração (ISO) como `dd/mm/aaaa, hh:mm`; `—` se inválida. */
 export function formatGeradoEmDateTime(iso: string): string {
   const d = new Date(iso);
   return Number.isNaN(d.getTime()) ? '—' : GERADO_EM_DT_FMT.format(d);

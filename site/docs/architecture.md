@@ -99,23 +99,33 @@ export const DATA_BASE_URL =
   import.meta.env.VITE_DATA_BASE_URL ?? 'https://dfdu08vi8wsus.cloudfront.net';
 export const PMTILES_URL = `${DATA_BASE_URL}/geo/brasil.pmtiles`;
 export const MANIFEST_URL = `${DATA_BASE_URL}/manifest/index.json`;
-export const UF_TOTALS_PARQUET = `${DATA_BASE_URL}/parquet-opt/uf-totals.parquet`;
+
+// A versão é lida do manifest no boot (`setParquetOptVersion`).
+// Sem ela, as helpers lançam: o prefixo legado `parquet-opt/` (sem
+// versão) foi aposentado e responde 403 no bucket.
+export function setParquetOptVersion(v: string | undefined): void;
+export function ufTotalsUrl(): string {
+  return `${DATA_BASE_URL}/parquet-opt/${parquetOptVersion}/uf-totals.parquet`;
+}
 export function ufPartitionUrl(ufSigla: string): string {
-  return `${DATA_BASE_URL}/parquet-opt/uf=${ufSigla}/part.parquet`;
+  return `${DATA_BASE_URL}/parquet-opt/${parquetOptVersion}/uf=${ufSigla}/part.parquet`;
 }
 ```
 
 ## _Boot_ e interação
 
-1. **_Boot_.** Página carrega `manifest/index.json` → popula selects
-   de biomarcador e competência, habilita _drill-down_ para as UFs
-   com dados.
+1. **_Boot_.** Página carrega `manifest/index.json`, chama
+   `setParquetOptVersion(manifest.parquetOptVersion)` e popula
+   selects de biomarcador e competência, habilitando _drill-down_
+   para as UFs com dados.
 2. **Visão nacional.** Ao escolher competência, `fetchUfAggregates()`
-   dispara um `SELECT ... FROM read_parquet('uf-totals.parquet')
-WHERE competencia = ?`. Um _Range Request_, resposta em milissegundos
+   dispara um `SELECT ... FROM read_parquet(...)` sobre
+   `parquet-opt/<parquetOptVersion>/uf-totals.parquet`
+   (`ufTotalsUrl()`). Um _Range Request_, resposta em milissegundos
    (o arquivo é < 1 MB).
 3. **_Drill-down_.** _Click_ numa UF dispara `fetchMunicipioAggregates(
-uf, competencia)`: DuckDB lê `parquet-opt/uf=XX/part.parquet` com
+uf, competencia)`: DuckDB lê
+   `parquet-opt/<parquetOptVersion>/uf=XX/part.parquet` com
    _filter pushdown_ por `competencia`. O _layer_ municipal do PMTiles
    é ativado no MapLibre; a geometria já foi baixada.
 4. **Troca de biomarcador/competência.** _Refetch_ seletivo da camada

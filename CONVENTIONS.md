@@ -26,14 +26,14 @@
 
 - [Conventional Commits](https://www.conventionalcommits.org/)
 - Em **pt-BR** na descrição; tipo (`feat`, `fix`, etc.) em inglês
-- Escopos válidos: `dbc`, `core`, `cli`, `docs`, `ci`, `deps`, `lint`, `config`
+- Escopos válidos: `site`, `cli`, `docs`, `ci`, `deps`, `lint`, `config` (iguais ao `.commitlintrc.cjs` e ao `AGENTS.md`)
 - Não incluir linhas de atribuição de IA
 
 Exemplos:
 
-- `feat(dbc): adicionar parser do header DBC`
-- `fix(core): corrigir encoding latin1 em campos com acentos`
-- `test(dbc): adicionar fixtures para testes de regressão`
+- `feat(site): versionar URLs de parquet-opt no manifest`
+- `fix(cli): corrigir encoding da saída JSON`
+- `test(site): adicionar fixtures para testes de regressão`
 - `docs: atualizar README com exemplo de uso`
 
 ## Testes
@@ -42,14 +42,26 @@ Exemplos:
 - Golden files / fixtures de referência em JSON
 - Nunca diminuir limiares de cobertura — adicionar testes para elevar
 
+## Estrutura e pacotes
+
+A estrutura atual (ver `AGENTS.md`) é:
+
+```
+packages/
+  cli/     → `@precisa-saude/datasus-cli`  (CLI `datasus-viz`, consome `@precisa-saude/datasus-sdk` via npm)
+site/      → `@datasus-viz/site`           (Vite + React + MapLibre + DuckDB WASM)
+```
+
+Os pacotes `@precisa-saude/datasus-dbc` e `@precisa-saude/datasus` / `@precisa-saude/datasus-sdk` **não vivem neste repositório**; o CLI e o site os consomem como dependência npm.
+
 ## Dependências
 
 **Perguntar antes de adicionar** dependências runtime novas. Justificar por quê e qual alternativa foi considerada.
 
 Regras por pacote:
 
-- `@precisa-saude/datasus-dbc`: apenas `dbffile` como dep runtime
-- `@precisa-saude/datasus`: `dbffile`, `basic-ftp`, `@precisa-saude/datasus-dbc`. Opcionalmente `@precisa-saude/fhir` para reuso de CID/LOINC.
+- `@precisa-saude/datasus-cli`: `@precisa-saude/datasus-sdk` como dep runtime (publicado no npm; não editar o SDK aqui)
+- `@datasus-viz/site`: ver `site/package.json`; o SDK entra em build-time (catálogo SIGTAP), não como runtime pesado no browser
 
 ## Git
 

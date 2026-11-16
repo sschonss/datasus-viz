@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { formatCompetencia, formatCompetenciaRange, formatGeradoEm } from '@/lib/format';
+import {
+  formatCompetencia,
+  formatCompetenciaRange,
+  formatGeradoEm,
+  formatGeradoEmDateTime,
+} from '@/lib/format';
 
 describe('formatCompetencia', () => {
   it('formata YYYY-MM para "Mmm. YYYY"', () => {
@@ -34,5 +39,23 @@ describe('formatGeradoEm', () => {
 
   it('formata data inválida como travessão', () => {
     expect(formatGeradoEm('não é data')).toBe('—');
+  });
+});
+
+describe('formatGeradoEmDateTime', () => {
+  it('formata data e hora no locale pt-BR', () => {
+    const iso = '2026-11-03T15:18:22.716Z';
+    const expected = new Intl.DateTimeFormat('pt-BR', {
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }).format(new Date(iso));
+    expect(formatGeradoEmDateTime(iso)).toBe(expected);
+  });
+
+  it('devolve traço para valor inválido', () => {
+    expect(formatGeradoEmDateTime('não é data')).toBe('—');
   });
 });
